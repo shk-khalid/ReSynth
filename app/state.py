@@ -5,5 +5,6 @@ class ResearchState(TypedDict):
     research_plan: List[str]
     sources: List[Dict]
     extracted_facts: List[Dict]
+    raw_documents: List[str]
     summaries: List[str]
-    final_reports: str
+    final_report: str

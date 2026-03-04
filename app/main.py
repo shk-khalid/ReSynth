@@ -1,5 +1,9 @@
 from fastapi import FastAPI
+from pydantic import BaseModel
 from app.graph import build_graph
+
+class ResearchRequest(BaseModel):
+    query: str
 
 app = FastAPI()
 
@@ -24,13 +28,15 @@ def health():
 
 
 @app.post(f"{BASE_PATH}/research")
-def research(query: str):
+def research(request: ResearchRequest):
+    query = request.query
     initial_state = {
         "query": query,
         "research_plan": [],
         "sources": [],
         "raw_documents": [],
         "extracted_facts": [],
+        "summaries": [],
         "final_report": ""
     }
 
