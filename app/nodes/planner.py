@@ -2,14 +2,17 @@ import json
 from app.llm import generate_json
 from app.state import ResearchState
 
-MAX_SUB_QUERIES = 4
+MAX_THEMES = 4
 
 def planner_node(state: ResearchState):
     prompt = f"""
-    Break the following research query into 3-4 focused sub-questions for web search.
+    Analyze the following research query and identify 3-4 key themes or subtopics 
+    that a comprehensive report should cover.
+
+    These are NOT search queries — they are thematic categories for organizing research findings.
 
     Respond ONLY with valid JSON in this exact format:
-    {{ "sub_queries": ["question 1", "question 2", "question 3"] }}
+    {{ "themes": ["theme 1", "theme 2", "theme 3"] }}
 
     Query: {state['query']}
     """
@@ -18,21 +21,20 @@ def planner_node(state: ResearchState):
 
     try:
         parsed = json.loads(raw)
-        sub_queries = parsed.get("sub_queries", [])
+        themes = parsed.get("themes", [])
 
-        if not isinstance(sub_queries, list) or len(sub_queries) == 0:
-            raise ValueError("Invalid or empty sub_queries")
+        if not isinstance(themes, list) or len(themes) == 0:
+            raise ValueError("Invalid or empty themes")
 
-        # Cap to MAX_SUB_QUERIES
-        sub_queries = [q.strip() for q in sub_queries[:MAX_SUB_QUERIES] if isinstance(q, str) and q.strip()]
+        themes = [t.strip() for t in themes[:MAX_THEMES] if isinstance(t, str) and t.strip()]
 
-        if not sub_queries:
-            raise ValueError("No valid sub-queries after filtering")
+        if not themes:
+            raise ValueError("No valid themes after filtering")
 
     except (json.JSONDecodeError, ValueError, KeyError) as e:
-        print(f"Planner JSON parse failed ({e}), falling back to original query.")
-        sub_queries = [state["query"]]
+        print(f"Planner JSON parse failed ({e}), falling back to original query as theme.")
+        themes = [state["query"]]
 
-    state["research_plan"] = sub_queries
+    state["research_plan"] = themes
 
     return state

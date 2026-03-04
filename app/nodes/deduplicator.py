@@ -2,7 +2,8 @@ import re
 from urllib.parse import urlparse
 from app.state import ResearchState
 
-MAX_FACTS = 30
+MAX_FACTS = 40
+MAX_PER_DOMAIN = 3
 
 def _normalize(text: str) -> str:
     """Lowercase, strip whitespace, remove punctuation."""
@@ -22,20 +23,16 @@ def deduplicator_node(state: ResearchState):
         if normalized in seen or not normalized:
             continue
 
-        # Track domain for diversity
-        source = fact.get("source_url", fact.get("source", ""))
+        # Domain diversity: cap facts per domain
+        source = fact.get("source_url", "")
         domain = urlparse(source).netloc if source else "unknown"
-        domain_counts[domain] = domain_counts.get(domain, 0) + 1
+
+        if domain_counts.get(domain, 0) >= MAX_PER_DOMAIN:
+            continue
 
         seen.add(normalized)
+        domain_counts[domain] = domain_counts.get(domain, 0) + 1
         unique_facts.append(fact)
-
-    # Sort to prefer facts from less-represented domains (source diversity)
-    unique_facts.sort(
-        key=lambda f: domain_counts.get(
-            urlparse(f.get("source_url", f.get("source", ""))).netloc, 0
-        )
-    )
 
     # Cap at MAX_FACTS
     state["extracted_facts"] = unique_facts[:MAX_FACTS]
