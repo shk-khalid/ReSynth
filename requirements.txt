@@ -1,0 +1,9 @@
+langgraph
+langchain
+fastapi
+uvicorn
+pydantic
+python-dotenv
+beautifulsoup4
+requests
+psycopg2-binary
