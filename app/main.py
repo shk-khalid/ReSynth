@@ -45,5 +45,6 @@ def research(request: ResearchRequest):
     return {
         "query": query,
         "facts_extracted": len(result["extracted_facts"]),
+        "sources_used": len(result["sources"]),
         "report": result["final_report"]
     }
