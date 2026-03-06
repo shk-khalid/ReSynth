@@ -10,6 +10,12 @@ def synthesizer_node(state: ResearchState):
     for fact in state["extracted_facts"]:
         fact_block += f"- {fact['fact']} (Source: {fact['source_url']})\n"
 
+    # Collect unique source URLs for the sources section
+    source_urls = list(dict.fromkeys(
+        fact["source_url"] for fact in state["extracted_facts"]
+    ))
+    sources_block = "\n".join(f"- {url}" for url in source_urls)
+
     # Use themes from planner to guide report structure
     themes = state.get("research_plan", [])
     theme_block = "\n".join(f"  - {t}" for t in themes) if themes else "  - General overview"
@@ -22,13 +28,19 @@ def synthesizer_node(state: ResearchState):
     2. Thematic Breakdown (organize findings under these themes):
 {theme_block}
     3. Key Findings & Data Points
+    4. Sources (list ALL source URLs used — copy them exactly from the facts below)
 
     CITATION RULES (STRICT):
     - Never generate citations such as (Author, Year) or (Organization, Year).
     - Only reference the exact source URLs provided with each fact.
-    - Format citations as: (Source: <url>)
+    - Format inline citations as: (Source: <url>)
     - If a source is unknown, omit the citation entirely.
     - Do NOT invent, guess, or fabricate any citation.
+
+    At the END of the report, include this exact section:
+    
+    Sources:
+{sources_block}
 
     CONTENT RULES:
     - Use ONLY the provided facts. Do not add outside knowledge.
