@@ -10,3 +10,4 @@ psycopg2-binary==2.9.11
 ollama==0.6.1
 tavily-python==0.7.22
 duckduckgo-search==8.1.1
+openai==2.41.1

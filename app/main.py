@@ -11,6 +11,16 @@ app = FastAPI()
 
 @app.exception_handler(ConnectionError)
 def connection_error_handler(request, exc):
+    detail_str = str(exc)
+    if "OpenRouter" in detail_str or "openrouter" in detail_str:
+        return JSONResponse(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            content={
+                "error": "OpenRouter service error",
+                "detail": detail_str,
+                "suggestion": "Please check your network connection and verify that your OPENROUTER_API_KEY is correct in your .env file."
+            }
+        )
     return JSONResponse(
         status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
         content={
