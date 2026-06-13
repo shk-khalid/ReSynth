@@ -69,14 +69,20 @@ def research(request: ResearchRequest):
         "raw_documents": [],
         "extracted_facts": [],
         "summaries": [],
+        "fact_clusters": [],
+        "confidence_scores": {},
         "final_report": ""
     }
 
     result = graph.invoke(initial_state)
 
+    confidence_data = result.get("confidence_scores", {})
+
     return {
         "query": query,
         "facts_extracted": len(result["extracted_facts"]),
         "sources_used": len(result["sources"]),
+        "overall_confidence": confidence_data.get("overall_confidence", 0.0),
+        "contradictions": confidence_data.get("contradictions", []),
         "report": result["final_report"]
     }

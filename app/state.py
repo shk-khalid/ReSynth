@@ -7,4 +7,6 @@ class ResearchState(TypedDict):
     extracted_facts: List[Dict]
     raw_documents: List[str]
     summaries: List[str]
+    fact_clusters: List[Dict]
+    confidence_scores: Dict
     final_report: str
